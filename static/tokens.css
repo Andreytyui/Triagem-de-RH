@@ -1,0 +1,84 @@
+/* A paleta e a tipografia da Triagem. Fonte única.
+ *
+ * Este é o único arquivo do projeto onde uma cor pode ser escrita como hex.
+ * Todo o resto — styles.css, e as três folhas embutidas nos documentos Python
+ * (shortlist.py, relatorio.py, rotas_mcp.py) — consome daqui por var(). Há
+ * teste na suíte que falha listando arquivo:linha se um hex aparecer fora.
+ *
+ * Por que um arquivo de CSS puro e não um dicionário em Python: quem edita
+ * cor é a identidade visual, não a engenharia, e CSS é o formato que ela já
+ * lê e escreve. O servidor lê este arquivo e embute o conteúdo nos documentos;
+ * não há etapa de build em lugar nenhum.
+ *
+ * Duas famílias de superfície, e a distinção importa: a TELA tem fundo
+ * levemente esverdeado com painéis brancos por cima; o DOCUMENTO impresso é
+ * branco, porque papel é branco. Trocar uma pela outra deixa o PDF do cliente
+ * cinza-esverdeado. Por isso `--papel` e `--papel-documento` são tokens
+ * distintos, e não um valor sobrescrito à mão em cada arquivo.
+ */
+
+/* IMPRESSO E TELA COMPARTILHAM VALOR, salvo motivo escrito aqui.
+ *
+ * Duas vezes já apareceu um valor de impressão levemente diferente do da tela
+ * — uma régua #d7dbd3 no lugar de #d3d8cf, um bege #fbf3e6 no lugar do
+ * --ocre-cl — e nas duas não havia comentário nenhum justificando. Sem razão
+ * registrada, a explicação provável é digitação de memória, não calibração de
+ * impressão: os dois foram unificados.
+ *
+ * Se algum dia um valor precisar mesmo divergir no papel, ele ganha token
+ * próprio E uma linha aqui dizendo por quê. Divergência sem justificativa
+ * escrita é deriva, e volta a ser unificada na próxima limpeza. */
+
+:root {
+  /* superfícies da tela */
+  --papel:       #eef0eb;
+  --papel-fundo: #e7eae4;
+  --painel:      #ffffff;
+
+  /* superfície do documento impresso — shortlist e relatório */
+  --papel-documento: #ffffff;
+  /* caixa em leve destaque sobre o papel branco: o bloco de critérios do
+     shortlist e a rubrica do relatório. */
+  --papel-realce: #f5f7f3;
+
+  /* texto — três níveis, e é essa a hierarquia que faltava */
+  --tinta:       #1b2320;   /* 13.99:1 no papel */
+  --tinta-media: #3d4642;   /*  8.50:1 */
+  --tinta-fraca: #5c6660;   /*  5.19:1 */
+  --tinta-reversa: #ffffff; /* texto sobre superfície de ação */
+
+  /* fios */
+  --regua:       #d3d8cf;   /* separação decorativa */
+  --regua-forte: #b9c1b6;   /* separação decorativa forte — sem piso de contraste */
+
+  /* Limite de controle: a borda que diz onde o controle começa. Piso de 3:1
+     (1.4.11) nas três superfícies. O teste: se esta linha sumisse, o usuário
+     ainda saberia onde o controle começa? Se não, é --contorno. */
+  --contorno:    #76837a;   /* 3.96:1 painel · 3.45:1 papel · 3.26:1 papel-fundo */
+
+  /* semântica */
+  --petroleo:     #16514e;  /* ação e "chamar" — 7.88:1 */
+  --petroleo-cl:  #e2ecea;
+  --petroleo-md:  #a8c6c1;
+  --petroleo-esc: #0e3c3a;  /* :hover da ação — branco sobre ele dá 12.17:1 */
+  --ocre:        #8a6011;   /* "talvez" — 4.86:1 */
+  --ocre-cl:     #f4ecdc;
+  --tijolo:      #7c4038;   /* erro e atenção — 6.91:1 */
+  --tijolo-cl:   #f3e6e3;
+
+  /* Rampa sequencial: um tom só, escuro para claro. Escala numerada porque o
+     que importa é a ORDEM, não o papel de cada tom — sufixo (cl/md/esc) fica
+     para variante semântica. --petroleo-1 é o mesmo valor de --petroleo. */
+  --petroleo-1: #16514e;  --petroleo-2: #2c6663;  --petroleo-3: #4a7d7a;
+  --petroleo-4: #6c9491;  --petroleo-5: #90aba9;  --petroleo-6: #b4c3c1;
+  --petroleo-7: #cdd6d4;
+
+  /* tipografia */
+  --sans:  "Instrument Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+           Roboto, sans-serif;
+  --serif: "Instrument Serif", ui-serif, Georgia, "Times New Roman", serif;
+
+  /* forma */
+  --r: 3px;
+  --largura-texto: 42rem;
+}

@@ -1,0 +1,20 @@
+fastapi>=0.115,<1
+uvicorn[standard]>=0.32
+python-multipart>=0.0.12
+pydantic[email]>=2.9,<3
+pdfplumber>=0.11
+python-docx>=1.1
+openpyxl>=3.1
+python-dotenv>=1.0
+# Volta por causa do backup: o artefato leva o banco de currículos de todas as
+# contas e o segredo das sessões, e precisa sair cifrado do disco.
+cryptography>=42.0
+mcp>=1.0
+
+# OCR do PDF escaneado. O pytesseract é só o invólucro: o programa Tesseract e o
+# pacote de idioma português são instalados fora do pip (apt na imagem Docker,
+# instalador próprio no Windows). Sem eles o sistema segue funcionando e avisa,
+# em vez de quebrar no primeiro currículo digitalizado.
+pymupdf>=1.24
+pytesseract>=0.3.10
+pillow>=10.0

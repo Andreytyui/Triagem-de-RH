@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="same-origin">
+<title>Triagem de currículos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/tokens.css">
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+
+<!-- ============ Entrada ============ -->
+<section class="entrada" id="tela-entrada" hidden>
+  <div class="entrada-caixa">
+    <h1 class="entrada-marca">Triagem</h1>
+    <p class="entrada-lema" id="entrada-lema">
+      Leia 150 currículos em minutos, com a nota de cada candidato ancorada num
+      trecho do próprio currículo.
+    </p>
+
+    <div class="abas" id="abas" role="tablist">
+      <button class="aba aba-ativa" id="aba-entrar" role="tab">Entrar</button>
+      <button class="aba" id="aba-criar" role="tab">Criar conta</button>
+    </div>
+
+    <form class="entrada-form" id="form-entrar">
+      <label class="campo">
+        <span>E-mail</span>
+        <input type="email" id="login-email" autocomplete="username" required>
+      </label>
+      <label class="campo">
+        <span>Senha</span>
+        <input type="password" id="login-senha" autocomplete="current-password" required>
+      </label>
+      <button class="btn-principal btn-largo" type="submit">Entrar</button>
+      <button class="btn-texto btn-abaixo" type="button" id="btn-esqueci"
+              data-entrada="form-recuperar" hidden>Esqueci minha senha</button>
+    </form>
+
+    <form class="entrada-form" id="form-criar" hidden>
+      <label class="campo">
+        <span>Empresa</span>
+        <input type="text" id="reg-org" autocomplete="organization" required>
+      </label>
+      <label class="campo">
+        <span>Seu nome</span>
+        <input type="text" id="reg-nome" autocomplete="name" required>
+      </label>
+      <label class="campo">
+        <span>E-mail</span>
+        <input type="email" id="reg-email" autocomplete="username" required>
+      </label>
+      <label class="campo">
+        <span>Senha</span>
+        <input type="password" id="reg-senha" autocomplete="new-password" required>
+        <small class="dica">Mínimo de 10 caracteres. Prefira uma frase a um símbolo.</small>
+      </label>
+      <label class="campo" id="campo-convite" hidden>
+        <span>Código de convite</span>
+        <input type="text" id="reg-convite">
+      </label>
+      <button class="btn-principal btn-largo" type="submit">Criar conta</button>
+    </form>
+
+    <!-- Recuperação de senha: o mesmo cartão, outro conteúdo. Nenhuma tela nova,
+         nenhum layout novo — é o que mantém o piso de qualidade de graça. -->
+    <form class="entrada-form" id="form-recuperar" hidden>
+      <h2 class="entrada-titulo" tabindex="-1">Esqueci minha senha</h2>
+      <p class="entrada-lema">Enviamos um link para você criar uma senha nova.</p>
+      <label class="campo">
+        <span>E-mail</span>
+        <input type="email" id="rec-email" autocomplete="username" required>
+      </label>
+      <button class="btn-principal btn-largo" type="submit">Enviar link de recuperação</button>
+      <button class="btn-texto btn-abaixo" type="button"
+              data-entrada="form-entrar">Voltar para entrar</button>
+    </form>
+
+    <!-- "Se existir uma conta" não é delicadeza: é a mesma resposta para e-mail
+         que existe e para e-mail que não existe. Dizer mais seria contar quem
+         tem conta neste servidor. -->
+    <div class="entrada-form" id="aviso-enviado" hidden>
+      <h2 class="entrada-titulo" tabindex="-1">Verifique seu e-mail</h2>
+      <p class="entrada-lema">
+        Se existir uma conta com esse e-mail, o link chegou lá. Ele vale por
+        30 minutos e serve uma vez só.
+      </p>
+      <button class="btn-texto" type="button" id="btn-reenviar">Reenviar</button>
+      <button class="btn-texto btn-abaixo" type="button"
+              data-entrada="form-entrar">Voltar para entrar</button>
+    </div>
+
+    <form class="entrada-form" id="form-redefinir" hidden>
+      <h2 class="entrada-titulo" tabindex="-1">Criar uma senha nova</h2>
+      <label class="campo">
+        <span>Senha</span>
+        <input type="password" id="red-senha" autocomplete="new-password" required>
+        <small class="dica">Mínimo de 10 caracteres. Prefira uma frase a um símbolo.</small>
+      </label>
+      <label class="linha-check">
+        <input type="checkbox" id="red-mostrar"> <span>mostrar senha</span>
+      </label>
+      <button class="btn-principal btn-largo" type="submit">Salvar nova senha</button>
+    </form>
+
+    <!-- Link morto tem tela própria: quem chegou aqui com um link na mão precisa
+         saber o que houve e sair andando, não ler um erro genérico. -->
+    <div class="entrada-form" id="aviso-link-morto" hidden>
+      <h2 class="entrada-titulo" tabindex="-1">Este link não vale mais</h2>
+      <p class="entrada-lema" id="texto-link-morto"></p>
+      <button class="btn-principal btn-largo" type="button"
+              data-entrada="form-recuperar">Pedir um link novo</button>
+    </div>
+
+    <!-- Instalação local: não há e-mail para mandar, e o recrutador é dono da
+         máquina onde o banco está. A saída é o comando, não um formulário. -->
+    <div class="entrada-form" id="aviso-local" hidden>
+      <h2 class="entrada-titulo" tabindex="-1">Redefinir a senha nesta máquina</h2>
+      <p class="entrada-lema">
+        A Triagem está rodando no seu próprio computador, então a senha se troca
+        por lá — sem e-mail e sem link. Na pasta da Triagem, rode:
+      </p>
+      <div class="frase-pronta">
+        <p id="frase-senha-local">python -m app.senha seu-email@empresa.com</p>
+        <button class="btn-secundario" data-copiar="frase-senha-local">Copiar</button>
+      </div>
+      <p class="dica">
+        Troque pelo e-mail da sua conta. O comando pede a senha nova na hora e não
+        mostra o que você digita. Suas sessões abertas caem e os tokens do
+        conector são revogados — o mesmo efeito do link por e-mail.
+      </p>
+      <button class="btn-texto btn-abaixo" type="button"
+              data-entrada="form-entrar">Voltar para entrar</button>
+    </div>
+
+    <p class="erro" id="erro-entrada" hidden></p>
+    <p class="entrada-nota">
+      Currículos são dados pessoais. Esta conta guarda os arquivos pelo prazo que
+      você definir e apaga sozinha depois disso.
+    </p>
+  </div>
+</section>
+
+<!-- ============ Aplicação ============ -->
+<div id="app" hidden>
+
+<header class="topo">
+  <div class="topo-marca">
+    <button class="topo-titulo" id="btn-inicio">Triagem</button>
+    <span class="topo-vaga" id="topo-vaga"></span>
+  </div>
+  <nav class="topo-acoes">
+    <button class="btn-texto" id="btn-vagas">Vagas</button>
+    <button class="btn-texto" id="btn-nova">Nova vaga</button>
+    <button class="btn-texto" id="btn-lgpd">Dados</button>
+    <button class="btn-texto" id="btn-config">Configurações</button>
+    <span class="topo-usuario" id="topo-usuario"></span>
+    <button class="btn-texto" id="btn-sair">Sair</button>
+  </nav>
+</header>
+
+<div class="faixa-aviso" id="faixa-aviso" hidden>
+  <span id="faixa-texto"></span>
+  <button class="btn-texto" id="faixa-acao" hidden></button>
+</div>
+
+<main id="palco">
+
+  <!-- Passo 1 — descrever a vaga -->
+  <section class="passo" id="passo-vaga" hidden>
+    <div class="passo-cabeca">
+      <span class="passo-num">1</span>
+      <h1>Descreva a vaga</h1>
+    </div>
+    <p class="passo-nota">
+      A partir desse texto o sistema propõe os critérios de avaliação. Quanto mais
+      concreto você for sobre o que o trabalho exige no dia a dia, melhor a proposta.
+    </p>
+
+    <label class="campo">
+      <span>Cargo</span>
+      <input id="in-titulo" type="text" placeholder="Analista de suporte pleno" autocomplete="off">
+    </label>
+
+    <label class="campo">
+      <span>Descrição</span>
+      <textarea id="in-descricao" rows="10" placeholder="Responsabilidades, requisitos obrigatórios, o que é desejável, senioridade, modelo de trabalho…"></textarea>
+      <small class="dica"><span id="conta-descricao">0</span> caracteres — a partir de 40 dá para gerar critérios</small>
+    </label>
+
+    <button class="btn-principal" id="btn-gerar">Propor critérios</button>
+    <p class="erro" id="erro-vaga" hidden></p>
+  </section>
+
+  <!-- Passo 2 — aprovar a rubrica -->
+  <section class="passo" id="passo-rubrica" hidden>
+    <div class="passo-cabeca">
+      <span class="passo-num">2</span>
+      <h1>Revise os critérios</h1>
+    </div>
+    <p class="passo-nota">
+      Nada é avaliado antes de você aprovar isto. Ajuste os pesos e o texto até refletir
+      como <em>você</em> decidiria — é essa rubrica que vai justificar cada nota depois.
+    </p>
+
+    <div class="bloco">
+      <h2>Eliminatórios</h2>
+      <p class="bloco-nota">
+        Condições binárias: quem não atende é cortado antes da pontuação. Use só para
+        o que torna a contratação impossível. Na dúvida, faça virar critério com peso alto.
+      </p>
+      <div id="lista-eliminatorios"></div>
+      <button class="btn-texto btn-add" id="btn-add-elim">Adicionar eliminatório</button>
+    </div>
+
+    <div class="bloco">
+      <h2>Critérios pontuados</h2>
+      <p class="bloco-nota">Cada um vale de 0 a 10. O peso decide quanto cada nota move o total.</p>
+
+      <div class="distribuicao" id="distribuicao" aria-hidden="true"></div>
+      <div class="distribuicao-legenda">
+        <span id="distribuicao-nomes"></span>
+        <span class="distribuicao-soma" id="soma-pesos">100%</span>
+      </div>
+
+      <div id="lista-criterios"></div>
+      <button class="btn-texto btn-add" id="btn-add-crit">Adicionar critério</button>
+    </div>
+
+    <label class="campo">
+      <span>Observações para o avaliador</span>
+      <textarea id="in-observacoes" rows="3" placeholder="Contexto que não cabe nos critérios. Ex.: o time é pequeno, então autonomia pesa mais que especialização."></textarea>
+    </label>
+
+    <button class="btn-principal" id="btn-aprovar">Aprovar critérios</button>
+    <p class="erro" id="erro-rubrica" hidden></p>
+  </section>
+
+  <!-- Passo 3 — enviar currículos -->
+  <section class="passo" id="passo-upload" hidden>
+    <div class="passo-cabeca">
+      <span class="passo-num">3</span>
+      <h1>Envie os currículos</h1>
+    </div>
+    <p class="passo-nota">
+      PDF, Word, texto, ou a planilha exportada do seu ATS. Arquivo repetido é
+      reconhecido pelo conteúdo e não é lido duas vezes.
+    </p>
+
+    <div class="solta" id="solta" tabindex="0" role="button" aria-label="Escolher arquivos">
+      <p class="solta-titulo">Solte os arquivos aqui</p>
+      <p class="solta-sub">ou clique para escolher</p>
+      <input type="file" id="in-arquivos" multiple hidden
+             accept=".pdf,.docx,.doc,.txt,.md,.rtf,.csv,.xlsx">
+    </div>
+
+    <div class="fila" id="fila-upload" hidden></div>
+
+    <!-- Modo conector: quem avalia é o Claude do plano do recrutador. -->
+    <div class="proximo" id="proximo-conector" hidden>
+      <h2>Agora peça ao Claude</h2>
+      <p class="bloco-nota">
+        A avaliação roda no seu plano do Claude, sem chave de API e sem custo por
+        currículo. Abra o Claude e mande esta frase:
+      </p>
+      <div class="frase-pronta">
+        <p id="frase-claude"></p>
+        <button class="btn-secundario" data-copiar="frase-claude">Copiar</button>
+      </div>
+      <p class="dica" id="dica-conector"></p>
+      <button class="btn-texto" id="btn-ver-status">Ver o andamento da avaliação</button>
+    </div>
+
+    <div class="linha-acoes">
+      <span class="contagem" id="contagem-curriculos"></span>
+    </div>
+    <p class="erro" id="erro-upload" hidden></p>
+  </section>
+
+  <!-- Passo 4 — resultados -->
+  <section class="passo passo-largo" id="passo-resultados" hidden>
+    <!-- Não é uma barra de progresso. É o registro do que o Claude do recrutador
+         já anotou: assíncrono, pausável, e não cancelável por nós. Os cinco
+         estados são desenhados em app.js, porque têm formas diferentes. -->
+    <div class="painel-status" id="painel-status" hidden></div>
+
+    <div class="resumo-corrida" id="resumo-corrida" hidden>
+      <div class="metricas" id="metricas"></div>
+      <div class="filtros">
+        <div class="filtros-grupo" role="group" aria-label="Filtrar por recomendação">
+          <button class="filtro filtro-ativo" data-f="todos">Todos</button>
+          <button class="filtro" data-f="chamar">Chamar</button>
+          <button class="filtro" data-f="talvez">Talvez</button>
+          <button class="filtro" data-f="descartar">Descartar</button>
+          <button class="filtro" data-f="entrevistar">Marcados</button>
+        </div>
+        <input type="search" class="busca" id="busca" placeholder="Buscar nome" aria-label="Buscar candidato">
+        <div class="filtros-grupo">
+          <a class="btn-texto" id="btn-shortlist" href="#" target="_blank" rel="noopener">Shortlist</a>
+          <a class="btn-texto" id="btn-csv" href="#">CSV</a>
+          <button class="btn-texto" id="btn-reavaliar">Reavaliar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="painel-duplo">
+      <ol class="ranking" id="ranking"></ol>
+      <aside class="detalhe" id="detalhe">
+        <p class="detalhe-vazio">Escolha um candidato para ver as notas e a evidência de cada uma.</p>
+      </aside>
+    </div>
+
+    <div class="vaga-acoes">
+      <button class="btn-texto" id="btn-arquivar-vaga">Arquivar vaga</button>
+      <button class="btn-remover" id="btn-apagar-vaga">Apagar vaga</button>
+    </div>
+  </section>
+
+  <!-- Painel: a primeira tela depois de entrar -->
+  <section class="passo passo-largo" id="passo-lista" hidden>
+    <div class="painel-cabeca">
+      <div>
+        <h1>Suas vagas</h1>
+        <p class="painel-sub" id="painel-sub"></p>
+      </div>
+      <button class="btn-principal" id="btn-nova-vaga">Nova vaga</button>
+    </div>
+    <label class="linha-check">
+      <input type="checkbox" id="ver-arquivadas"> <span>mostrar vagas arquivadas</span>
+    </label>
+    <div id="lista-vagas"></div>
+  </section>
+
+  <!-- Configurações -->
+  <section class="passo" id="passo-config" hidden>
+    <div class="passo-cabeca"><h1>Configurações</h1></div>
+
+    <!-- O caminho padrão do produto vem primeiro. -->
+    <div class="bloco">
+      <h2>Conector do Claude</h2>
+      <p class="bloco-nota">
+        É assim que a Triagem avalia currículos: o Claude do <strong>seu plano</strong>
+        faz a leitura e a pontuação. Não há chave de API, não há custo por currículo.
+        Ele recebe os currículos <strong>anonimizados</strong> — nome e contato só
+        aparecem quando você pede, e a consulta fica registrada.
+      </p>
+
+      <div class="cartao">
+        <h3 class="cartao-titulo">No Claude Desktop, no seu computador</h3>
+        <p class="bloco-nota">
+          É o caminho de quem roda a Triagem na própria máquina. Rode o programa
+          <code>conectar-claude.ps1</code> na pasta da Triagem: ele pede seu e-mail
+          e sua senha daqui e configura tudo sozinho.
+        </p>
+        <p class="bloco-nota">
+          Se preferir fazer à mão, gere um token abaixo e cole no
+          <code>claude_desktop_config.json</code>.
+        </p>
+        <div class="form-inline">
+          <input type="text" id="mcp-rotulo" placeholder="Para que é este token? Ex.: meu notebook">
+          <button class="btn-principal" id="btn-gerar-token">Gerar token</button>
+        </div>
+        <div id="mcp-token-novo" hidden></div>
+        <div id="lista-tokens"></div>
+      </div>
+
+      <div class="cartao">
+        <h3 class="cartao-titulo">No claude.ai ou no ChatGPT, pela internet</h3>
+        <p class="bloco-nota">
+          Só funciona com a Triagem publicada num endereço com HTTPS — eles rodam
+          na nuvem e não alcançam um endereço local. Em Conectores → Adicionar
+          conector personalizado, cole:
+        </p>
+        <div class="form-inline">
+          <input type="text" id="mcp-url" readonly aria-label="Endereço do conector">
+          <button class="btn-secundario" id="btn-copiar-url">Copiar</button>
+        </div>
+        <p class="dica" id="mcp-aviso-local" hidden>
+          Este endereço é local e o claude.ai não alcança ele. Para usar por lá,
+          publique a Triagem num endereço https e ajuste
+          <code>TRIAGEM_BASE_URL</code>.
+        </p>
+      </div>
+
+      <button class="btn-texto" id="btn-desconectar-mcp">Desconectar todos os conectores</button>
+      <p class="erro" id="erro-mcp" hidden></p>
+    </div>
+
+    <div class="bloco">
+      <h2>Conta</h2>
+      <label class="campo">
+        <span>Nome da empresa</span>
+        <input type="text" id="cfg-nome">
+      </label>
+      <label class="campo">
+        <span>Retenção de currículos (dias)</span>
+        <input type="number" id="cfg-retencao" min="7" max="1825">
+        <small class="dica">Passado esse prazo, o currículo e o arquivo original são apagados sozinhos. É a sua política de LGPD.</small>
+      </label>
+      <button class="btn-principal" id="btn-salvar-config">Salvar</button>
+      <p class="erro" id="erro-config" hidden></p>
+      <p class="ok" id="ok-config" hidden></p>
+    </div>
+
+    <div class="bloco" id="bloco-usuarios">
+      <h2>Pessoas com acesso</h2>
+      <div id="lista-usuarios"></div>
+      <details class="expandivel">
+        <summary>Adicionar pessoa</summary>
+        <form class="form-inline" id="form-usuario">
+          <input type="text" id="nu-nome" placeholder="Nome" required minlength="2">
+          <input type="email" id="nu-email" placeholder="E-mail" required>
+          <input type="password" id="nu-senha" placeholder="Senha inicial" autocomplete="new-password" required>
+          <select id="nu-papel">
+            <option value="recrutador">Recrutador</option>
+            <option value="admin">Administrador</option>
+          </select>
+          <button class="btn-principal" id="btn-add-usuario">Adicionar</button>
+        </form>
+        <p class="erro" id="erro-usuario" hidden></p>
+      </details>
+    </div>
+
+    <div class="bloco">
+      <h2>Sua senha</h2>
+      <form class="form-inline" id="form-senha">
+        <input type="password" id="senha-atual" placeholder="Senha atual" autocomplete="current-password" required>
+        <input type="password" id="senha-nova" placeholder="Nova senha" autocomplete="new-password" required>
+        <button class="btn-principal" id="btn-trocar-senha">Trocar</button>
+      </form>
+      <p class="erro" id="erro-senha" hidden></p>
+      <p class="ok" id="ok-senha" hidden></p>
+    </div>
+  </section>
+
+  <!-- LGPD -->
+  <section class="passo" id="passo-lgpd" hidden>
+    <div class="passo-cabeca"><h1>Dados pessoais</h1></div>
+    <p class="passo-nota">
+      Um candidato pode pedir para ver ou apagar o que você guarda sobre ele.
+      Aqui você atende esse pedido e fica com o registro de que atendeu.
+    </p>
+
+    <div class="metricas" id="lgpd-resumo"></div>
+
+    <div class="bloco">
+      <h2>Encontrar um candidato</h2>
+      <div class="form-inline">
+        <input type="search" id="lgpd-busca" placeholder="Nome, e-mail ou telefone">
+        <button class="btn-principal" id="btn-lgpd-buscar">Buscar</button>
+      </div>
+      <div id="lgpd-achados"></div>
+    </div>
+
+    <div class="bloco" id="bloco-auditoria">
+      <h2>Registro de acesso</h2>
+      <p class="bloco-nota">Quem abriu, exportou e apagou o quê. Guardado por dois anos.</p>
+      <div id="lista-auditoria"></div>
+    </div>
+  </section>
+
+</main>
+</div>
+
+<div class="brinde" id="brinde" hidden></div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

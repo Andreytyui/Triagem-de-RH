@@ -1,0 +1,5 @@
+-r requirements.txt
+
+# Só para os testes. O servidor não precisa disso em produção.
+reportlab>=4.0
+httpx>=0.27

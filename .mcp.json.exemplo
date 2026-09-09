@@ -1,0 +1,13 @@
+{
+    "mcpServers":  {
+                       "triagem":  {
+                                       "command":  "C:/Users/andre/OneDrive/Desktop/triagem/.venv/Scripts/python.exe",
+                                       "args":  [
+                                                    "C:/Users/andre/OneDrive/Desktop/triagem/mcp_local.py"
+                                                ],
+                                       "env":  {
+                                                   "TRIAGEM_MCP_TOKEN":  "cole-aqui-o-token-gerado-em-Configuracoes"
+                                               }
+                                   }
+                   }
+}

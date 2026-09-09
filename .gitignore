@@ -1,0 +1,24 @@
+__pycache__/
+*.py[cod]
+.env
+data/
+.venv/
+venv/
+.pytest_cache/
+
+# contem o token do conector - nunca versionar
+.mcp.json
+.mcp.backup-*.json
+.mcp.quebrado-*.json
+
+# Backups: cifrados, mas nem por isso vão para o repositório.
+backups/
+*.triagem
+
+# Dataset sintetico do teste ponta a ponta: gerado por script, nao versionado.
+dataset-piloto/
+
+# Estado local de ferramentas (Claude Code, Maestri) - nao e parte do produto.
+.claude/settings.local.json
+.claude/scheduled_tasks.lock
+.maestri/
